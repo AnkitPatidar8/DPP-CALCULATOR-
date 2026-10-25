@@ -1,0 +1,1229 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10243a">
+  <title>Banking DP Calculator</title>
+
+  <style>
+    :root {
+      --navy: #10243a;
+      --navy-light: #1c3955;
+      --teal: #0d9488;
+      --teal-dark: #087f75;
+      --bg: #f3f6fa;
+      --white: #ffffff;
+      --text: #243447;
+      --muted: #708096;
+      --border: #e1e8f0;
+      --danger: #c0394b;
+      --shadow: 0 8px 28px rgba(16, 36, 58, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .topbar {
+      background: var(--navy);
+      color: white;
+      padding: 20px 24px;
+    }
+
+    .topbar-inner {
+      max-width: 1120px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      flex-shrink: 0;
+      border-radius: 13px;
+      background: rgba(13, 148, 136, 0.2);
+      color: #65e0d2;
+      font-size: 24px;
+    }
+
+    .brand-name {
+      font-size: 18px;
+      font-weight: 750;
+      letter-spacing: 0.2px;
+    }
+
+    .brand-subtitle {
+      margin-top: 4px;
+      color: #b6c7d8;
+      font-size: 12px;
+    }
+
+    .status {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #bcefe6;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #50d5b6;
+    }
+
+    main {
+      max-width: 1120px;
+      margin: 34px auto;
+      padding: 0 22px 40px;
+    }
+
+    .page-heading {
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      color: var(--teal-dark);
+      font-weight: 750;
+      font-size: 11px;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 9px 0;
+      color: var(--navy);
+      font-size: clamp(25px, 4vw, 34px);
+      letter-spacing: -0.8px;
+    }
+
+    .page-description {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .case-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 20px;
+      padding: 7px;
+      background: #e9eef5;
+      border-radius: 14px;
+    }
+
+    .case-tab {
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background: transparent;
+      color: #64748b;
+      padding: 14px 10px;
+      font-weight: 650;
+      font-size: 13px;
+      transition: 0.2s ease;
+    }
+
+    .case-tab:hover {
+      color: var(--navy);
+      background: rgba(255,255,255,0.6);
+    }
+
+    .case-tab.active {
+      color: var(--navy);
+      background: white;
+      border-color: var(--border);
+      box-shadow: 0 3px 10px rgba(16,36,58,0.06);
+    }
+
+    .case-number {
+      display: inline-grid;
+      place-items: center;
+      width: 23px;
+      height: 23px;
+      margin-right: 5px;
+      border-radius: 7px;
+      background: #e6f5f3;
+      color: var(--teal-dark);
+      font-size: 11px;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.88fr);
+      align-items: start;
+      gap: 20px;
+    }
+
+    .panel {
+      min-width: 0;
+      padding: 25px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 23px;
+    }
+
+    .panel-heading h2 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 19px;
+    }
+
+    .panel-heading p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .case-badge {
+      flex-shrink: 0;
+      border-radius: 8px;
+      background: #e8f7f4;
+      color: var(--teal-dark);
+      padding: 7px 10px;
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: 0.7px;
+    }
+
+    .field {
+      margin-bottom: 19px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      color: #34465a;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .input-wrap {
+      display: flex;
+      align-items: center;
+      min-height: 49px;
+      border: 1px solid #d8e1eb;
+      border-radius: 10px;
+      background: #fff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      overflow: hidden;
+    }
+
+    .input-wrap:focus-within {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13,148,136,0.10);
+    }
+
+    .currency-symbol {
+      padding-left: 14px;
+      color: #728096;
+      font-size: 14px;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      min-width: 0;
+      padding: 14px;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--navy);
+      font-size: 14px;
+    }
+
+    input::placeholder {
+      color: #a4afbd;
+    }
+
+    .field-error {
+      min-height: 0;
+      margin-top: 5px;
+      color: var(--danger);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .field-error:empty {
+      display: none;
+    }
+
+    .dd-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 13px;
+    }
+
+    .dd-heading label {
+      margin: 0;
+      color: #34465a;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .dd-item {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .dd-item .field {
+      flex: 1;
+      min-width: 0;
+      margin-bottom: 0;
+    }
+
+    .dd-label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .remove-dd {
+      width: 46px;
+      height: 49px;
+      flex-shrink: 0;
+      border: 1px solid #f0d9dd;
+      border-radius: 10px;
+      background: #fff7f8;
+      color: var(--danger);
+      font-size: 20px;
+    }
+
+    .remove-dd:hover {
+      background: #ffe9ec;
+    }
+
+    .add-dd {
+      width: 100%;
+      padding: 11px;
+      border: 1px dashed #9acfc8;
+      border-radius: 10px;
+      background: #f4fbfa;
+      color: var(--teal-dark);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .add-dd:hover {
+      background: #e8f7f4;
+    }
+
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 46px;
+      padding: 12px 19px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px;
+      transition: 0.2s;
+    }
+
+    .btn-primary {
+      flex: 1;
+      border: 1px solid var(--teal);
+      background: var(--teal);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--teal-dark);
+    }
+
+    .btn-secondary {
+      border: 1px solid var(--border);
+      background: white;
+      color: #526175;
+    }
+
+    .btn-secondary:hover {
+      background: #f6f8fb;
+    }
+
+    .results-panel {
+      background: #fbfcfe;
+    }
+
+    .results-intro {
+      margin-bottom: 19px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .result-card {
+      padding: 19px;
+      margin-bottom: 13px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: white;
+    }
+
+    .result-card.primary {
+      border-color: #bce6df;
+      background: linear-gradient(135deg, #f1fbf9, #ffffff);
+    }
+
+    .result-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 13px;
+      color: #607187;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .result-icon {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: #e6f5f3;
+      color: var(--teal-dark);
+      font-size: 15px;
+    }
+
+    .result-value {
+      overflow-wrap: anywhere;
+      color: var(--navy);
+      font-size: clamp(22px, 3vw, 29px);
+      font-weight: 800;
+      letter-spacing: -0.7px;
+    }
+
+    .result-formula {
+      margin-top: 10px;
+      color: #78879a;
+      font-size: 11px;
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+    }
+
+    .empty-state {
+      display: grid;
+      place-items: center;
+      padding: 30px 12px;
+      text-align: center;
+      border: 1px dashed #d4dfea;
+      border-radius: 13px;
+    }
+
+    .empty-icon {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      margin-bottom: 13px;
+      border-radius: 16px;
+      background: #eaf0f7;
+      color: var(--navy-light);
+      font-size: 25px;
+    }
+
+    .empty-state strong {
+      color: var(--navy);
+      font-size: 14px;
+    }
+
+    .empty-state p {
+      max-width: 235px;
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .notice {
+      margin-top: 19px;
+      padding: 13px;
+      border-radius: 10px;
+      background: #eef4f9;
+      color: #62758b;
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .notice strong {
+      color: var(--navy);
+    }
+
+    .footer {
+      margin-top: 23px;
+      text-align: center;
+      color: #8995a5;
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 760px) {
+      main {
+        margin-top: 25px;
+        padding: 0 15px 30px;
+      }
+
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        padding: 20px;
+      }
+
+      .results-panel {
+        min-height: 240px;
+      }
+    }
+
+    @media (max-width: 460px) {
+      .topbar {
+        padding: 16px;
+      }
+
+      .brand-icon {
+        width: 40px;
+        height: 40px;
+      }
+
+      .brand-name {
+        font-size: 15px;
+      }
+
+      .brand-subtitle {
+        font-size: 10px;
+      }
+
+      .status {
+        font-size: 10px;
+      }
+
+      .case-tabs {
+        gap: 4px;
+        padding: 5px;
+      }
+
+      .case-tab {
+        padding: 11px 4px;
+        font-size: 11px;
+        line-height: 1.5;
+      }
+
+      .case-number {
+        display: grid;
+        margin: 0 auto 5px;
+      }
+
+      .panel {
+        padding: 17px;
+        border-radius: 14px;
+      }
+
+      .form-actions .btn {
+        width: 100%;
+        flex: auto;
+      }
+
+      .result-value {
+        font-size: 24px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-icon" aria-hidden="true">▤</div>
+      <div>
+        <div class="brand-name">Banking DP Calculator</div>
+        <div class="brand-subtitle">Financial calculation workspace</div>
+      </div>
+      <div class="status">
+        <span class="status-dot" aria-hidden="true"></span>
+        Calculator Ready
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-heading">
+      <div class="eyebrow">Banking Tools / DP Calculator</div>
+      <h1>Calculate with confidence.</h1>
+      <p class="page-description">
+        Enter case details to calculate DP amounts and charges
+        with clear, easy-to-review results.
+      </p>
+    </section>
+
+    <div class="case-tabs" role="tablist" aria-label="Select case type">
+      <button class="case-tab active" id="tab-fresh"
+        type="button" role="tab" aria-selected="true"
+        aria-controls="case-form" data-case="fresh">
+        <span class="case-number">01</span><br>
+        Fresh Case
+      </button>
+
+      <button class="case-tab" id="tab-enhancement"
+        type="button" role="tab" aria-selected="false"
+        aria-controls="case-form" data-case="enhancement" tabindex="-1">
+        <span class="case-number">02</span><br>
+        Enhancement
+      </button>
+
+      <button class="case-tab" id="tab-takeover"
+        type="button" role="tab" aria-selected="false"
+        aria-controls="case-form" data-case="takeover" tabindex="-1">
+        <span class="case-number">03</span><br>
+        Takeover Case
+      </button>
+    </div>
+
+    <div class="dashboard">
+      <section class="panel" id="case-form" role="tabpanel"
+        aria-labelledby="tab-fresh">
+        <div class="panel-heading">
+          <div>
+            <h2 id="form-title">Fresh Case Details</h2>
+            <p id="form-description">
+              Enter the one-year DP and applicable charges.
+            </p>
+          </div>
+          <span class="case-badge" id="case-badge">FRESH</span>
+        </div>
+
+        <form id="calculator-form" novalidate>
+          <div id="fields-container"></div>
+
+          <div id="form-error" class="field-error"
+            role="alert" aria-live="polite"></div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+              <span aria-hidden="true">＝</span>
+              Calculate DP
+            </button>
+            <button type="button" class="btn btn-secondary"
+              id="reset-btn">
+              ↻ Reset
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel results-panel"
+        aria-labelledby="results-heading" aria-live="polite">
+        <div class="panel-heading">
+          <div>
+            <h2 id="results-heading">Calculation Results</h2>
+            <p>Your calculated values will appear here.</p>
+          </div>
+          <span class="case-badge">INR ₹</span>
+        </div>
+
+        <div id="results-container">
+          <div class="empty-state">
+            <div class="empty-icon" aria-hidden="true">₹</div>
+            <strong>Ready to calculate</strong>
+            <p>
+              Enter the required values and select Calculate DP
+              to see your results.
+            </p>
+          </div>
+        </div>
+
+        <div class="notice">
+          <strong>Calculation note</strong><br>
+          Results use the formulas configured for each case type.
+          Verify the applicable banking policy before using figures
+          for an actual transaction.
+        </div>
+      </section>
+    </div>
+
+    <footer class="footer">
+      Banking DP Calculator · Independent calculation tool<br>
+      No bank affiliation or live banking integration.
+    </footer>
+  </main>
+
+  <script>
+    "use strict";
+
+    const RATE = 0.90;
+    const MAX_DD_FIELDS = 50;
+
+    const caseConfig = {
+      fresh: {
+        title: "Fresh Case Details",
+        description: "Enter the one-year DP and applicable charges.",
+        badge: "FRESH",
+        fields: [
+          {
+            id: "yearDP",
+            label: "1 Year DP",
+            placeholder: "Enter one-year DP amount"
+          },
+          {
+            id: "charges",
+            label: "Charges",
+            placeholder: "Enter charges"
+          }
+        ]
+      },
+
+      enhancement: {
+        title: "Enhancement Case Details",
+        description: "Enter existing drawing power, one-year DP and charges.",
+        badge: "ENHANCEMENT",
+        fields: [
+          {
+            id: "drawingPower",
+            label: "Drawing Power",
+            placeholder: "Enter current drawing power"
+          },
+          {
+            id: "yearDP",
+            label: "1 Year DP",
+            placeholder: "Enter one-year DP amount"
+          },
+          {
+            id: "charges",
+            label: "Charges",
+            placeholder: "Enter charges"
+          }
+        ]
+      },
+
+      takeover: {
+        title: "Takeover Case Details",
+        description: "Add all DD amounts and enter applicable charges.",
+        badge: "TAKEOVER",
+        fields: [
+          {
+            id: "charges",
+            label: "Charges",
+            placeholder: "Enter charges"
+          }
+        ]
+      }
+    };
+
+    let activeCase = "fresh";
+    let ddValues = [""];
+    let lastResults = null;
+
+    const form = document.getElementById("calculator-form");
+    const fieldsContainer = document.getElementById("fields-container");
+    const resultsContainer = document.getElementById("results-container");
+    const formError = document.getElementById("form-error");
+
+    function formatINR(value) {
+      return new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(value);
+    }
+
+    function fieldMarkup(field) {
+      return `
+        <div class="field">
+          <label for="${field.id}">${field.label}</label>
+          <div class="input-wrap">
+            <span class="currency-symbol" aria-hidden="true">₹</span>
+            <input
+              id="${field.id}"
+              name="${field.id}"
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+              placeholder="${field.placeholder}"
+              aria-describedby="${field.id}-error"
+              required
+            >
+          </div>
+          <div class="field-error" id="${field.id}-error"
+            aria-live="polite"></div>
+        </div>
+      `;
+    }
+
+    function renderFields() {
+      const config = caseConfig[activeCase];
+
+      document.getElementById("form-title").textContent = config.title;
+      document.getElementById("form-description").textContent =
+        config.description;
+      document.getElementById("case-badge").textContent = config.badge;
+
+      fieldsContainer.innerHTML = config.fields.map(fieldMarkup).join("");
+
+      if (activeCase === "takeover") {
+        const ddSection = document.createElement("div");
+        ddSection.className = "field";
+        ddSection.innerHTML = `
+          <div class="dd-heading">
+            <label>DD Amounts</label>
+            <span class="case-badge" id="dd-count">
+              ${ddValues.length} DD
+            </span>
+          </div>
+          <div id="dd-list"></div>
+          <button type="button" class="add-dd" id="add-dd">
+            + Add DD Amount
+          </button>
+          <div class="field-error" id="dd-error"
+            role="alert" aria-live="polite"></div>
+        `;
+
+        fieldsContainer.insertBefore(ddSection, fieldsContainer.firstChild);
+        renderDDFields();
+      }
+
+      formError.textContent = "";
+    }
+
+    function renderDDFields() {
+      const list = document.getElementById("dd-list");
+      if (!list) return;
+
+      list.innerHTML = ddValues.map((value, index) => `
+        <div class="dd-item">
+          <div class="field">
+            <label class="dd-label" for="dd-${index}">
+              DD Amount ${index + 1}
+            </label>
+            <div class="input-wrap">
+              <span class="currency-symbol" aria-hidden="true">₹</span>
+              <input
+                type="number"
+                id="dd-${index}"
+                name="dd-${index}"
+                min="0"
+                step="any"
+                inputmode="decimal"
+                placeholder="Enter DD amount"
+                value="${escapeAttribute(value)}"
+                required
+                aria-describedby="dd-${index}-error"
+              >
+            </div>
+            <div class="field-error" id="dd-${index}-error"
+              aria-live="polite"></div>
+          </div>
+          <button type="button" class="remove-dd"
+            data-remove-dd="${index}"
+            aria-label="Remove DD amount ${index + 1}"
+            title="Remove DD amount"
+            ${ddValues.length === 1 ? "disabled" : ""}>×</button>
+        </div>
+      `).join("");
+
+      document.getElementById("dd-count").textContent =
+        `${ddValues.length} DD`;
+
+      document.getElementById("add-dd").disabled =
+        ddValues.length >= MAX_DD_FIELDS;
+
+      document.getElementById("add-dd").title =
+        ddValues.length >= MAX_DD_FIELDS
+          ? `Maximum ${MAX_DD_FIELDS} DD fields allowed`
+          : "Add another DD amount";
+    }
+
+    function escapeAttribute(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function clearResults() {
+      lastResults = null;
+
+      resultsContainer.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon" aria-hidden="true">₹</div>
+          <strong>Ready to calculate</strong>
+          <p>
+            Enter the required values and select Calculate DP
+            to see your results.
+          </p>
+        </div>
+      `;
+    }
+
+    function clearFieldErrors() {
+      fieldsContainer.querySelectorAll(".field-error").forEach(el => {
+        el.textContent = "";
+      });
+
+      fieldsContainer.querySelectorAll("[aria-invalid]").forEach(el => {
+        el.removeAttribute("aria-invalid");
+      });
+
+      formError.textContent = "";
+    }
+
+    function showFieldError(input, message) {
+      input.setAttribute("aria-invalid", "true");
+
+      const error = document.getElementById(`${input.id}-error`);
+      if (error) error.textContent = message;
+    }
+
+    function readAmount(id, label) {
+      const input = document.getElementById(id);
+      const raw = input.value.trim();
+
+      if (raw === "") {
+        showFieldError(input, `${label} is required.`);
+        return null;
+      }
+
+      const value = Number(raw);
+
+      if (!Number.isFinite(value)) {
+        showFieldError(input, `Enter a valid ${label.toLowerCase()}.`);
+        return null;
+      }
+
+      if (value < 0) {
+        showFieldError(input, `${label} cannot be negative.`);
+        return null;
+      }
+
+      return value;
+    }
+
+    function renderResults(cards) {
+      resultsContainer.innerHTML = cards.map((card, index) => `
+        <article class="result-card ${index === 0 ? "primary" : ""}">
+          <div class="result-label">
+            <span class="result-icon" aria-hidden="true">
+              ${index === 0 ? "₹" : "✓"}
+            </span>
+            ${card.label}
+          </div>
+          <div class="result-value">${formatINR(card.value)}</div>
+          <div class="result-formula">${card.formula}</div>
+        </article>
+      `).join("");
+    }
+
+    function calculate(event) {
+      event.preventDefault();
+      clearFieldErrors();
+
+      const values = {};
+
+      const config = caseConfig[activeCase];
+      let valid = true;
+
+      for (const field of config.fields) {
+        const value = readAmount(field.id, field.label);
+
+        if (value === null) {
+          valid = false;
+        } else {
+          values[field.id] = value;
+        }
+      }
+
+      let ddTotal = 0;
+
+      if (activeCase === "takeover") {
+        ddValues.forEach((_, index) => {
+          const input = document.getElementById(`dd-${index}`);
+          const raw = input.value.trim();
+          const error = document.getElementById(`dd-${index}-error`);
+
+          if (raw === "") {
+            input.setAttribute("aria-invalid", "true");
+            error.textContent = `DD Amount ${index + 1} is required.`;
+            valid = false;
+            return;
+          }
+
+          const value = Number(raw);
+
+          if (!Number.isFinite(value) || value < 0) {
+            input.setAttribute("aria-invalid", "true");
+            error.textContent = "Enter a valid, non-negative amount.";
+            valid = false;
+            return;
+          }
+
+          ddTotal += value;
+
+          if (!Number.isFinite(ddTotal)) {
+            input.setAttribute("aria-invalid", "true");
+            error.textContent = "The total DD amount is too large.";
+            valid = false;
+          }
+        });
+      }
+
+      if (!valid) {
+        formError.textContent =
+          "Please correct the highlighted fields before calculating.";
+        const firstInvalid = fieldsContainer.querySelector(
+          '[aria-invalid="true"]'
+        );
+        if (firstInvalid) firstInvalid.focus();
+        return;
+      }
+
+      let cards = [];
+
+      if (activeCase === "fresh") {
+        const dpAmount = values.yearDP * RATE;
+        const amount = dpAmount + values.charges;
+
+        cards = [
+          {
+            label: "DP Amount",
+            value: dpAmount,
+            formula: `1 Year DP × 90% = ${formatINR(values.yearDP)} × 90%`
+          },
+          {
+            label: "Amount",
+            value: amount,
+            formula: `DP Amount + Charges = ${formatINR(dpAmount)} + ${formatINR(values.charges)}`
+          }
+        ];
+      }
+
+      if (activeCase === "enhancement") {
+        const difference = values.yearDP - values.drawingPower;
+        const adjustedDP = difference * RATE;
+        const newDPSet = adjustedDP + values.drawingPower;
+        const amount = adjustedDP - values.charges;
+
+        cards = [
+          {
+            label: "New DP Set",
+            value: newDPSet,
+            formula: `[(1 Year DP − Drawing Power) × 90%] + Drawing Power = [(${formatINR(values.yearDP)} − ${formatINR(values.drawingPower)}) × 90%] + ${formatINR(values.drawingPower)}`
+          },
+          {
+            label: "Amount",
+            value: amount,
+            formula: `[(1 Year DP − Drawing Power) × 90%] − Charges = ${formatINR(adjustedDP)} − ${formatINR(values.charges)}`
+          }
+        ];
+      }
+
+      if (activeCase === "takeover") {
+        const dpAmount = ddTotal + values.charges;
+
+        cards = [
+          {
+            label: "Amount",
+            value: ddTotal,
+            formula: `Sum of ${ddValues.length} DD amount(s)`
+          },
+          {
+            label: "DP Amount",
+            value: dpAmount,
+            formula: `Sum of DD Amounts + Charges = ${formatINR(ddTotal)} + ${formatINR(values.charges)}`
+          }
+        ];
+      }
+
+      if (cards.some(card => !Number.isFinite(card.value))) {
+        formError.textContent =
+          "The result exceeds the supported numeric range. Check your inputs.";
+        clearResults();
+        return;
+      }
+
+      lastResults = { caseType: activeCase, cards };
+      renderResults(cards);
+    }
+
+    function resetCalculator() {
+      form.reset();
+      ddValues = [""];
+      clearFieldErrors();
+      clearResults();
+      renderFields();
+    }
+
+    document.querySelectorAll(".case-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        activeCase = tab.dataset.case;
+
+        document.querySelectorAll(".case-tab").forEach(item => {
+          const selected = item === tab;
+          item.classList.toggle("active", selected);
+          item.setAttribute("aria-selected", String(selected));
+          item.tabIndex = selected ? 0 : -1;
+        });
+
+        document.getElementById("case-form")
+          .setAttribute("aria-labelledby", tab.id);
+
+        ddValues = [""];
+        clearResults();
+        renderFields();
+      });
+
+      tab.addEventListener("keydown", event => {
+        if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
+          return;
+        }
+
+        event.preventDefault();
+
+        const tabs = [...document.querySelectorAll(".case-tab")];
+        const currentIndex = tabs.indexOf(tab);
+        let nextIndex = currentIndex;
+
+        if (event.key === "ArrowRight") {
+          nextIndex = (currentIndex + 1) % tabs.length;
+        } else if (event.key === "ArrowLeft") {
+          nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+        } else if (event.key === "Home") {
+          nextIndex = 0;
+        } else if (event.key === "End") {
+          nextIndex = tabs.length - 1;
+        }
+
+        tabs[nextIndex].focus();
+        tabs[nextIndex].click();
+      });
+    });
+
+    fieldsContainer.addEventListener("click", event => {
+      if (event.target.id === "add-dd") {
+        if (ddValues.length >= MAX_DD_FIELDS) return;
+
+        // Preserve entered values before rebuilding the DD fields.
+        ddValues = ddValues.map((_, index) =>
+          document.getElementById(`dd-${index}`).value
+        );
+
+        ddValues.push("");
+        clearResults();
+        renderDDFields();
+
+        document.getElementById(`dd-${ddValues.length - 1}`).focus();
+      }
+
+      const removeButton = event.target.closest("[data-remove-dd]");
+
+      if (removeButton) {
+        if (ddValues.length <= 1) return;
+
+        ddValues = ddValues.map((_, index) =>
+          document.getElementById(`dd-${index}`).value
+        );
+
+        const removeIndex = Number(removeButton.dataset.removeDd);
+        ddValues.splice(removeIndex, 1);
+
+        clearResults();
+        renderDDFields();
+      }
+    });
+
+    fieldsContainer.addEventListener("input", event => {
+      if (event.target.id.startsWith("dd-")) {
+        const index = Number(event.target.id.slice(3));
+        if (Number.isInteger(index) && index >= 0 && index < ddValues.length) {
+          ddValues[index] = event.target.value;
+        }
+      }
+
+      // Results are refreshed on submission, so edits invalidate old results.
+      if (lastResults) clearResults();
+    });
+
+    fieldsContainer.addEventListener("change", event => {
+      if (event.target.matches('input[type="number"]')) {
+        const error = document.getElementById(`${event.target.id}-error`);
+        if (error) error.textContent = "";
+        event.target.removeAttribute("aria-invalid");
+      }
+    });
+
+    form.addEventListener("submit", calculate);
+    document.getElementById("reset-btn")
+      .addEventListener("click", resetCalculator);
+
+    renderFields();
+  </script>
+</body>
+</html>
